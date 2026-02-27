@@ -1,6 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { videos } from '../data/videos';
+import { videoCardHtml, byRecent } from '../utils/videos';
+
+const relatedDefault = byRecent(videos).slice(0, 8);
 ---
 
 <BaseLayout title="Tonton | ilmu.my">
@@ -9,7 +12,9 @@ import { videos } from '../data/videos';
     <div class="section-head">
       <h2>Cadangan Lain</h2>
     </div>
-    <div id="relatedVideos" class="video-grid"></div>
+    <div id="relatedVideos" class="video-grid">
+      {relatedDefault.map((v) => <Fragment set:html={videoCardHtml(v)} />)}
+    </div>
     <div id="relatedLoadMoreWrap" class="load-more-wrap" style="display:none;">
       <button class="btn" id="relatedLoadMoreBtn" type="button">Muat lagi 8 video</button>
     </div>

@@ -1,13 +1,18 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { videos } from '../data/videos';
+import { videoCardHtml, byRecent } from '../utils/videos';
+
+const allVideos = byRecent(videos);
 ---
 
 <BaseLayout title="Kategori | ilmu.my">
   <section class="section-head">
     <h1 id="categoryTitle">Kategori</h1>
   </section>
-  <div id="categoryVideos" class="video-grid"></div>
+  <div id="categoryVideos" class="video-grid">
+    {allVideos.map((v) => <Fragment set:html={videoCardHtml(v)} />)}
+  </div>
 
   <script id="videos-data" type="application/json" set:html={JSON.stringify(videos)}></script>
   <script type="module">
