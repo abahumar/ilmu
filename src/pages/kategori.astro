@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { videos } from '../data/videos';
+---
+
+<BaseLayout title="Kategori | ilmu.my">
+  <section class="section-head">
+    <h1 id="categoryTitle">Kategori</h1>
+  </section>
+  <div id="categoryVideos" class="video-grid"></div>
+
+  <script id="videos-data" type="application/json" set:html={JSON.stringify(videos)}></script>
+  <script type="module">
+    import { videoCardHtml } from '../utils/videos';
+
+    const videos = JSON.parse(document.getElementById('videos-data')?.textContent || '[]');
+    const title = document.getElementById('categoryTitle');
+    const target = document.getElementById('categoryVideos');
+
+    const category = new URLSearchParams(window.location.search).get('k') || 'Semua';
+    if (title) {
+      title.textContent = `Kategori: ${category}`;
+    }
+
+    const filtered = videos.filter((video) => (category === 'Semua' ? true : video.category === category));
+
+    if (target) {
+      target.innerHTML = filtered.length
+        ? filtered.map(videoCardHtml).join('')
+        : '<p class="muted">Tiada video ditemui untuk kategori ini.</p>';
+    }
+  </script>
+</BaseLayout>

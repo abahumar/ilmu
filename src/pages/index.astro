@@ -1,0 +1,123 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { videos } from '../data/videos';
+import { byRecent, THUMB_ONERROR, uniqCategories, videoThumb } from '../utils/videos';
+
+const categories = uniqCategories(videos);
+const PAGE_SIZE = 8;
+const allLatestVideos = byRecent(videos);
+const latestVideos = allLatestVideos.slice(0, PAGE_SIZE);
+const remainingVideos = allLatestVideos.slice(PAGE_SIZE);
+---
+
+<BaseLayout>
+  <section class="hero">
+    <h1>Video Ilmu Islam Terpilih</h1>
+    <p>
+      Koleksi kuliah dan tazkirah daripada saluran YouTube dipercayai. Tonton
+      terus di sini melalui embed YouTube.
+    </p>
+    <div class="hero-actions">
+      <a class="btn" href="/carian">Cari Video</a>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Kategori</h2>
+    </div>
+    <div class="category-list">
+      {categories.map((category) => (
+        <a class="chip" href={`/kategori?k=${encodeURIComponent(category)}`}>{category}</a>
+      ))}
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Terkini</h2>
+    </div>
+    <div class="video-grid" id="latest-video-grid">
+      {latestVideos.map((video) => (
+        <article class="card">
+          <a href={`/tonton?v=${encodeURIComponent(video.id)}`} aria-label={`Tonton ${video.title}`}>
+            <img class="thumb" src={videoThumb(video.id)} alt={`Thumbnail ${video.title}`} loading="lazy" onerror={THUMB_ONERROR} />
+          </a>
+          <div class="video-card-content">
+            <h3 class="video-title">
+              <a href={`/tonton?v=${encodeURIComponent(video.id)}`}>{video.title}</a>
+            </h3>
+            <p class="meta">
+              {video.channel} • {video.category}
+            </p>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    {remainingVideos.length > 0 && (
+      <div class="load-more-wrap">
+        <button class="btn" id="load-more-videos" type="button">Muat lagi 8 video</button>
+      </div>
+    )}
+  </section>
+
+  {remainingVideos.length > 0 && (
+    <script type="application/json" id="remaining-videos-data" set:html={JSON.stringify(remainingVideos)} />
+  )}
+
+  <script>
+    const pageSize = 8;
+    const grid = document.getElementById('latest-video-grid');
+    const loadMoreButton = document.getElementById('load-more-videos');
+    const remainingVideosData = document.getElementById('remaining-videos-data');
+
+    if (grid && loadMoreButton && remainingVideosData) {
+      const remainingVideos = JSON.parse(remainingVideosData.textContent || '[]');
+      let offset = 0;
+
+      const escapeHtml = (value) =>
+        String(value ?? '')
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
+
+      const videoThumb = (videoId) =>
+        `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg`;
+
+      const toVideoCardHtml = (video) => {
+        const watchUrl = `/tonton?v=${encodeURIComponent(video.id)}`;
+        return `
+          <article class="card">
+            <a href="${watchUrl}" aria-label="Tonton ${escapeHtml(video.title)}">
+              <img class="thumb" src="${videoThumb(video.id)}" alt="Thumbnail ${escapeHtml(video.title)}" loading="lazy" onerror="this.onerror=null;this.src='/thumb-fallback.svg'" />
+            </a>
+            <div class="video-card-content">
+              <h3 class="video-title">
+                <a href="${watchUrl}">${escapeHtml(video.title)}</a>
+              </h3>
+              <p class="meta">${escapeHtml(video.channel)} • ${escapeHtml(video.category)}</p>
+            </div>
+          </article>
+        `;
+      };
+
+      loadMoreButton.addEventListener('click', () => {
+        const nextBatch = remainingVideos.slice(offset, offset + pageSize);
+        if (nextBatch.length === 0) {
+          loadMoreButton.style.display = 'none';
+          return;
+        }
+
+        grid.insertAdjacentHTML('beforeend', nextBatch.map(toVideoCardHtml).join(''));
+        offset += nextBatch.length;
+
+        if (offset >= remainingVideos.length) {
+          loadMoreButton.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</BaseLayout>

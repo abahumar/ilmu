@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Lapor Kandungan | ilmu.my">
+  <section class="section-head">
+    <h1>Lapor Kandungan</h1>
+    <p class="muted">
+      Jika anda menemui kandungan tidak sesuai, sila laporkan untuk semakan.
+    </p>
+  </section>
+  <form id="reportForm" class="card form-grid">
+    <label>
+      URL Video di ilmu.my
+      <input id="reportUrl" type="url" required placeholder="https://ilmu.my/tonton?v=..." />
+    </label>
+    <label>
+      Sebab Laporan
+      <select id="reportReason" required>
+        <option value="">Pilih sebab</option>
+        <option>Maklumat meragukan</option>
+        <option>Tidak sesuai dengan nilai laman</option>
+        <option>Spam / penipuan</option>
+        <option>Lain-lain</option>
+      </select>
+    </label>
+    <label>
+      Keterangan ringkas
+      <textarea id="reportNotes" rows="4" placeholder="Tulis ringkasan laporan..."></textarea>
+    </label>
+    <button class="btn" type="submit">Hantar Laporan</button>
+    <p id="reportStatus" class="muted"></p>
+  </form>
+
+  <script is:inline>
+    const form = document.getElementById('reportForm');
+    const status = document.getElementById('reportStatus');
+
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const payload = {
+        url: document.getElementById('reportUrl')?.value || '',
+        reason: document.getElementById('reportReason')?.value || '',
+        notes: document.getElementById('reportNotes')?.value || '',
+        submittedAt: new Date().toISOString()
+      };
+
+      const existing = JSON.parse(localStorage.getItem('ilmu_reports') || '[]');
+      existing.push(payload);
+      localStorage.setItem('ilmu_reports', JSON.stringify(existing));
+
+      form.reset();
+      if (status) {
+        status.textContent = 'Laporan diterima. Terima kasih atas maklum balas anda.';
+      }
+    });
+  </script>
+</BaseLayout>

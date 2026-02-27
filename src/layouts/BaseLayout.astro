@@ -1,0 +1,47 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+import '../styles/global.css';
+
+const {
+  title = 'ilmu.my | Video Ilmu Islam',
+  description = 'ilmu.my ialah platform video ilmu Islam berasaskan kandungan YouTube terpilih untuk tontonan mudah dan tersusun.'
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="ms">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a href="/" class="brand">ilmu.my</a>
+        <nav class="nav-links">
+          <a href="/">Utama</a>
+          <a href="/carian">Carian</a>
+          <a href="/lapor">Lapor</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-links">
+        <a href="/terma">Terma Penggunaan</a>
+        <a href="/privasi">Dasar Privasi</a>
+        <a href="/penafian">Penafian Kandungan</a>
+      </div>
+    </footer>
+  </body>
+</html>

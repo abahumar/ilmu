@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { videos } from '../data/videos';
+---
+
+<BaseLayout title="Carian | ilmu.my">
+  <section class="section-head">
+    <h1>Carian Video</h1>
+  </section>
+  <form id="searchForm" class="search-form">
+    <input id="searchInput" type="search" placeholder="Cari tajuk, ustaz, atau topik..." required />
+    <button class="btn" type="submit">Cari</button>
+  </form>
+  <div id="searchResultInfo" class="muted"></div>
+  <div id="searchResults" class="video-grid"></div>
+
+  <script id="videos-data" type="application/json" set:html={JSON.stringify(videos)}></script>
+  <script type="module">
+    import { videoCardHtml } from '../utils/videos';
+
+    const videos = JSON.parse(document.getElementById('videos-data')?.textContent || '[]');
+    const form = document.getElementById('searchForm');
+    const input = document.getElementById('searchInput');
+    const target = document.getElementById('searchResults');
+    const info = document.getElementById('searchResultInfo');
+
+    const getQueryParam = (name) => new URLSearchParams(window.location.search).get(name);
+    const runSearch = (query) => {
+      const trimmed = query.trim().toLowerCase();
+      if (!trimmed) {
+        target.innerHTML = '';
+        info.textContent = '';
+        return;
+      }
+
+      const results = videos.filter((video) => {
+        const bag = [video.title, video.channel, video.category, ...(video.tags || [])].join(' ').toLowerCase();
+        return bag.includes(trimmed);
+      });
+
+      info.textContent = `${results.length} hasil ditemui untuk "${query}"`;
+      target.innerHTML = results.length
+        ? results.map(videoCardHtml).join('')
+        : '<p class="muted">Tiada hasil carian. Cuba kata kunci lain.</p>';
+    };
+
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      runSearch(input?.value || '');
+      const params = new URLSearchParams(window.location.search);
+      params.set('q', input?.value || '');
+      window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+    });
+
+    const initialQuery = getQueryParam('q') || '';
+    if (input && initialQuery) {
+      input.value = initialQuery;
+      runSearch(initialQuery);
+    }
+  </script>
+</BaseLayout>
