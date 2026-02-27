@@ -11,7 +11,19 @@ import { videos } from '../data/videos';
 
   <script id="videos-data" type="application/json" set:html={JSON.stringify(videos)}></script>
   <script type="module">
-    import { videoCardHtml } from '../utils/videos';
+    const safeText = (value) => String(value ?? '').replace(/[<>]/g, '');
+    const videoThumb = (videoId) => `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg`;
+    const videoCardHtml = (video) => `
+      <article class="card">
+        <a href="/tonton?v=${encodeURIComponent(video.id)}" aria-label="Tonton ${safeText(video.title)}">
+          <img class="thumb" src="${videoThumb(video.id)}" alt="Thumbnail ${safeText(video.title)}" loading="lazy" onerror="this.onerror=null;this.src='/thumb-fallback.svg'" />
+        </a>
+        <div class="video-card-content">
+          <h3 class="video-title"><a href="/tonton?v=${encodeURIComponent(video.id)}">${safeText(video.title)}</a></h3>
+          <p class="meta">${safeText(video.channel)} • ${safeText(video.category)}</p>
+        </div>
+      </article>
+    `;
 
     const videos = JSON.parse(document.getElementById('videos-data')?.textContent || '[]');
     const title = document.getElementById('categoryTitle');
