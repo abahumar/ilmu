@@ -90,6 +90,7 @@ a {
 .hero p {
   color: var(--muted);
   max-width: 740px;
+  margin-bottom: 1.5rem;
 }
 
 .btn {
@@ -263,4 +264,14 @@ a {
 .legal-page p {
   color: var(--muted);
   max-width: 760px;
+}
+
+h1 {
+  font-size: 1.4rem;
+}
+
+@media (min-width: 768px) {
+  h1 {
+    font-size: 1.75rem;
+  }
 }
