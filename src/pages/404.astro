@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Halaman Tidak Ditemui | ilmu.my">
+  <section class="not-found">
+    <h1>404</h1>
+    <p>Halaman yang anda cari tidak wujud atau telah dialihkan.</p>
+    <a class="btn" href="/">Kembali ke Utama</a>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    text-align: center;
+    padding: 4rem 0;
+  }
+  .not-found h1 {
+    font-size: 4rem;
+    margin: 0;
+  }
+  .not-found p {
+    color: var(--muted);
+    margin: 1rem 0 2rem;
+  }
+</style>
